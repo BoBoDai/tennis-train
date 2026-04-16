@@ -33,9 +33,22 @@ def main() -> None:
     adapter = ModelAdapter(str(model_path))
 
     if args.calibration_data:
-        print(f"使用 {len(args.calibration_data)} 张图片进行静态量化...")
+        # Expand directories and glob image files
+        image_exts = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
+        image_paths: list[str] = []
+        for entry in args.calibration_data:
+            p = Path(entry)
+            if p.is_dir():
+                image_paths.extend(
+                    str(f) for f in sorted(p.iterdir()) if f.suffix.lower() in image_exts
+                )
+            elif p.is_file() and p.suffix.lower() in image_exts:
+                image_paths.append(str(p))
+        if not image_paths:
+            raise ValueError(f"No image files found in: {args.calibration_data}")
+        print(f"使用 {len(image_paths)} 张图片进行静态量化...")
         quantized_path = adapter.export_quantized(
-            calibration_data=args.calibration_data,
+            calibration_data=image_paths,
             calibration_method=args.calibration_method,
             int8=True,
         )

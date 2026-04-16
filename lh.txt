@@ -1,0 +1,470 @@
+.venv\Scripts\python.exe -W ignore -m tennis_train.quantize `
+  --model runs\detect\runs\tennis\train2\weights\best.pt `
+  --calibration-data "dataset\valid\images"
+
+
+
+root@0a828d0b1427:/workspace# 
+root@0a828d0b1427:/workspace# mkdir -p /workspace/tpu_convert && cd /workspace/tpu_convert
+root@0a828d0b1427:/workspace/tpu_convert# model_transform.py \
+  --model_name yolov8n_tennis \
+  --model_def ../runs/detect/runs/tennis/train2/weights/best.onnx \
+  --input_shapes [[1,3,640,640]] \
+  --mean 0.0,0.0,0.0 \
+  --scale 0.0039216,0.0039216,0.0039216 \
+  --keep_aspect_ratio \
+  --pixel_format rgb \
+  --mlir yolov8n_tennis.mlir
+2026/04/17 01:11:01 - INFO : TPU-MLIR v1.27-20260206
+2026/04/17 01:11:01 - INFO : 
+         _____________________________________________________ 
+        | preprocess:                                           |
+        |   (x - mean) * scale                                  |
+        '-------------------------------------------------------'
+  config Preprocess args : 
+        resize_dims           : same to net input dims
+        keep_aspect_ratio     : True
+        keep_ratio_mode       : letterbox
+        pad_value             : 0
+        pad_type              : center
+        --------------------------
+        mean                  : [0.0, 0.0, 0.0]
+        scale                 : [0.0039216, 0.0039216, 0.0039216]
+        --------------------------
+        pixel_format          : rgb
+        channel_format        : nchw
+        yuv_type              : 
+
+2026/04/17 01:11:03 - INFO : Input_shape assigned
+2026/04/17 01:11:03 - WARNING : ConstantFolding failed.
+2026/04/17 01:11:03 - INFO : ConstantFolding finished
+2026/04/17 01:11:03 - INFO : skip_fuse_bn:False
+2026/04/17 01:11:03 - WARNING : onnxsim opt failed.
+2026/04/17 01:11:03 - INFO : Onnxsim opt finished
+2026/04/17 01:11:03 - WARNING : ConstantFolding failed.
+2026/04/17 01:11:03 - INFO : ConstantFolding finished
+2026/04/17 01:11:03 - INFO : Save mlir file: yolov8n_tennis_origin.mlir
+[Running]: tpuc-opt yolov8n_tennis_origin.mlir --struct-optimize --shape-infer --canonicalize --extra-optimize -o yolov8n_tennis.mlir
+[Success]: tpuc-opt yolov8n_tennis_origin.mlir --struct-optimize --shape-infer --canonicalize --extra-optimize -o yolov8n_tennis.mlir
+2026/04/17 01:11:04 - INFO : Mlir file generated:yolov8n_tennis.mlir
+root@0a828d0b1427:/workspace/tpu_convert# run_calibration.py yolov8n_tennis.mlir \
+  --dataset ../dataset/valid/images \
+  --input_num 100 \
+  -o yolov8n_cali_table
+TPU-MLIR v1.27-20260206
+2026/04/17 01:11:19 - INFO : 
+  load_config Preprocess args : 
+        resize_dims           : [640, 640]
+        keep_aspect_ratio     : True
+        keep_ratio_mode       : letterbox
+        pad_value             : 0
+        pad_type              : center
+        input_dims            : [640, 640]
+        --------------------------
+        mean                  : [0.0, 0.0, 0.0]
+        scale                 : [0.0039216, 0.0039216, 0.0039216]
+        --------------------------
+        pixel_format          : rgb
+        channel_format        : nchw
+        yuv_type              : 
+
+input_num = 100, ref = 100
+real input_num = 100
+activation_collect_and_calc_th for sample: 0:   0%|                                                                                                     | 0/100 [00:00<?, ?it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 1:   2%|█▊                                                                                           | 2/100 [00:00<00:37,  2.59it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 2:   3%|██▊                                                                                          | 3/100 [00:01<00:52,  1.84it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 3:   4%|███▋                                                                                         | 4/100 [00:02<01:00,  1.59it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 4:   5%|████▋                                                                                        | 5/100 [00:03<01:03,  1.49it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 5:   6%|█████▌                                                                                       | 6/100 [00:03<01:05,  1.42it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 6:   7%|██████▌                                                                                      | 7/100 [00:04<01:07,  1.39it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 7:   8%|███████▍                                                                                     | 8/100 [00:05<01:07,  1.37it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 8:   9%|████████▎                                                                                    | 9/100 [00:06<01:07,  1.35it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 9:  10%|█████████▏                                                                                  | 10/100 [00:06<01:06,  1.35it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 10:  11%|██████████                                                                                 | 11/100 [00:07<01:05,  1.35it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 11:  12%|██████████▉                                                                                | 12/100 [00:08<01:05,  1.34it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 12:  13%|███████████▊                                                                               | 13/100 [00:09<01:04,  1.34it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 13:  14%|████████████▋                                                                              | 14/100 [00:09<01:03,  1.34it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 14:  15%|█████████████▋                                                                             | 15/100 [00:10<01:03,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 15:  16%|██████████████▌                                                                            | 16/100 [00:11<01:03,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 16:  17%|███████████████▍                                                                           | 17/100 [00:12<01:02,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 17:  18%|████████████████▍                                                                          | 18/100 [00:12<01:01,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 18:  19%|█████████████████▎                                                                         | 19/100 [00:13<01:01,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 19:  20%|██████████████████▏                                                                        | 20/100 [00:14<01:00,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 20:  21%|███████████████████                                                                        | 21/100 [00:15<00:59,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 21:  22%|████████████████████                                                                       | 22/100 [00:15<00:58,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 22:  23%|████████████████████▉                                                                      | 23/100 [00:16<00:58,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 23:  24%|█████████████████████▊                                                                     | 24/100 [00:17<00:57,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 24:  25%|██████████████████████▊                                                                    | 25/100 [00:18<01:10,  1.06it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 25:  26%|███████████████████████▋                                                                   | 26/100 [00:19<01:05,  1.12it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 26:  27%|████████████████████████▌                                                                  | 27/100 [00:20<01:02,  1.17it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 27:  28%|█████████████████████████▍                                                                 | 28/100 [00:21<00:59,  1.21it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 28:  29%|██████████████████████████▍                                                                | 29/100 [00:21<00:57,  1.24it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 29:  30%|███████████████████████████▎                                                               | 30/100 [00:22<00:55,  1.26it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 30:  31%|████████████████████████████▏                                                              | 31/100 [00:23<00:54,  1.27it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 31:  32%|█████████████████████████████                                                              | 32/100 [00:24<00:53,  1.28it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 32:  33%|██████████████████████████████                                                             | 33/100 [00:24<00:51,  1.29it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 33:  34%|██████████████████████████████▉                                                            | 34/100 [00:25<00:50,  1.30it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 34:  35%|███████████████████████████████▊                                                           | 35/100 [00:26<00:49,  1.30it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 35:  36%|████████████████████████████████▊                                                          | 36/100 [00:27<00:48,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 36:  37%|█████████████████████████████████▋                                                         | 37/100 [00:27<00:47,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 37:  38%|██████████████████████████████████▌                                                        | 38/100 [00:28<00:46,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 38:  39%|███████████████████████████████████▍                                                       | 39/100 [00:29<00:46,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 39:  40%|████████████████████████████████████▍                                                      | 40/100 [00:30<00:45,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 40:  41%|█████████████████████████████████████▎                                                     | 41/100 [00:30<00:44,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 41:  42%|██████████████████████████████████████▏                                                    | 42/100 [00:31<00:43,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 42:  43%|███████████████████████████████████████▏                                                   | 43/100 [00:32<00:43,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 43:  44%|████████████████████████████████████████                                                   | 44/100 [00:33<00:42,  1.31it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 44:  45%|████████████████████████████████████████▉                                                  | 45/100 [00:33<00:42,  1.31it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 45:  46%|█████████████████████████████████████████▊                                                 | 46/100 [00:34<00:41,  1.31it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 46:  47%|██████████████████████████████████████████▊                                                | 47/100 [00:35<00:40,  1.31it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 47:  48%|███████████████████████████████████████████▋                                               | 48/100 [00:36<00:39,  1.31it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 48:  49%|████████████████████████████████████████████▌                                              | 49/100 [00:36<00:38,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 49:  50%|█████████████████████████████████████████████▌                                             | 50/100 [00:37<00:37,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 50:  51%|██████████████████████████████████████████████▍                                            | 51/100 [00:38<00:36,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 51:  52%|███████████████████████████████████████████████▎                                           | 52/100 [00:39<00:36,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 52:  53%|████████████████████████████████████████████████▏                                          | 53/100 [00:40<00:35,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 53:  54%|█████████████████████████████████████████████████▏                                         | 54/100 [00:40<00:34,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 54:  55%|██████████████████████████████████████████████████                                         | 55/100 [00:41<00:33,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 55:  56%|██████████████████████████████████████████████████▉                                        | 56/100 [00:42<00:33,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 56:  57%|███████████████████████████████████████████████████▊                                       | 57/100 [00:43<00:33,  1.30it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 57:  58%|████████████████████████████████████████████████████▊                                      | 58/100 [00:43<00:32,  1.30it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 58:  59%|█████████████████████████████████████████████████████▋                                     | 59/100 [00:44<00:31,  1.30it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 59:  60%|██████████████████████████████████████████████████████▌                                    | 60/100 [00:45<00:30,  1.31it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 60:  61%|███████████████████████████████████████████████████████▌                                   | 61/100 [00:46<00:29,  1.31it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 61:  62%|████████████████████████████████████████████████████████▍                                  | 62/100 [00:46<00:28,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 62:  63%|█████████████████████████████████████████████████████████▎                                 | 63/100 [00:47<00:27,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 63:  64%|██████████████████████████████████████████████████████████▏                                | 64/100 [00:48<00:28,  1.25it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 64:  65%|███████████████████████████████████████████████████████████▏                               | 65/100 [00:49<00:33,  1.05it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 65:  66%|████████████████████████████████████████████████████████████                               | 66/100 [00:50<00:30,  1.12it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 66:  67%|████████████████████████████████████████████████████████████▉                              | 67/100 [00:51<00:28,  1.18it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 67:  68%|█████████████████████████████████████████████████████████████▉                             | 68/100 [00:52<00:26,  1.21it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 68:  69%|██████████████████████████████████████████████████████████████▊                            | 69/100 [00:52<00:25,  1.24it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 69:  70%|███████████████████████████████████████████████████████████████▋                           | 70/100 [00:53<00:23,  1.25it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 70:  71%|████████████████████████████████████████████████████████████████▌                          | 71/100 [00:54<00:23,  1.25it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 71:  72%|█████████████████████████████████████████████████████████████████▌                         | 72/100 [00:55<00:22,  1.25it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 72:  73%|██████████████████████████████████████████████████████████████████▍                        | 73/100 [00:56<00:21,  1.27it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 73:  74%|███████████████████████████████████████████████████████████████████▎                       | 74/100 [00:56<00:20,  1.27it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 74:  75%|████████████████████████████████████████████████████████████████████▎                      | 75/100 [00:57<00:19,  1.29it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 75:  76%|█████████████████████████████████████████████████████████████████████▏                     | 76/100 [00:58<00:18,  1.30it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 76:  77%|██████████████████████████████████████████████████████████████████████                     | 77/100 [00:59<00:17,  1.31it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 77:  78%|██████████████████████████████████████████████████████████████████████▉                    | 78/100 [00:59<00:16,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 78:  79%|███████████████████████████████████████████████████████████████████████▉                   | 79/100 [01:00<00:15,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 79:  80%|████████████████████████████████████████████████████████████████████████▊                  | 80/100 [01:01<00:15,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 80:  81%|█████████████████████████████████████████████████████████████████████████▋                 | 81/100 [01:02<00:14,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 81:  82%|██████████████████████████████████████████████████████████████████████████▌                | 82/100 [01:02<00:13,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 82:  83%|███████████████████████████████████████████████████████████████████████████▌               | 83/100 [01:03<00:12,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 83:  84%|████████████████████████████████████████████████████████████████████████████▍              | 84/100 [01:04<00:12,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 84:  85%|█████████████████████████████████████████████████████████████████████████████▎             | 85/100 [01:05<00:11,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 85:  86%|██████████████████████████████████████████████████████████████████████████████▎            | 86/100 [01:05<00:10,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 86:  87%|███████████████████████████████████████████████████████████████████████████████▏           | 87/100 [01:06<00:09,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 87:  88%|████████████████████████████████████████████████████████████████████████████████           | 88/100 [01:07<00:09,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 88:  89%|████████████████████████████████████████████████████████████████████████████████▉          | 89/100 [01:08<00:08,  1.32it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 89:  90%|█████████████████████████████████████████████████████████████████████████████████▉         | 90/100 [01:08<00:07,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 90:  91%|██████████████████████████████████████████████████████████████████████████████████▊        | 91/100 [01:09<00:06,  1.34it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 91:  92%|███████████████████████████████████████████████████████████████████████████████████▋       | 92/100 [01:10<00:05,  1.34it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 92:  93%|████████████████████████████████████████████████████████████████████████████████████▋      | 93/100 [01:11<00:05,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 93:  94%|█████████████████████████████████████████████████████████████████████████████████████▌     | 94/100 [01:11<00:04,  1.34it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 94:  95%|██████████████████████████████████████████████████████████████████████████████████████▍    | 95/100 [01:12<00:03,  1.35it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 95:  96%|███████████████████████████████████████████████████████████████████████████████████████▎   | 96/100 [01:13<00:03,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 96:  97%|████████████████████████████████████████████████████████████████████████████████████████▎  | 97/100 [01:14<00:02,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 97:  98%|█████████████████████████████████████████████████████████████████████████████████████████▏ | 98/100 [01:14<00:01,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 98:  99%|██████████████████████████████████████████████████████████████████████████████████████████ | 99/100 [01:15<00:00,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 99: 100%|██████████████████████████████████████████████████████████████████████████████████████████| 100/100 [01:16<00:00,  1.33it/s][##################################################] 100%
+activation_collect_and_calc_th for sample: 99: 100%|██████████████████████████████████████████████████████████████████████████████████████████| 100/100 [01:17<00:00,  1.30it/s]
+[2048] threshold: output0_Concat: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████| 184/184 [00:00<00:00, 778.35it/s]
+tune op: output0_Concat: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 184/184 [00:47<00:00,  3.84it/s]
+auto tune end, run time:48.37868285179138
+root@0a828d0b1427:/workspace/tpu_convert# model_deploy.py \
+  --mlir yolov8n_tennis.mlir \
+  --quantize INT8 \
+  --calibration_table yolov8n_cali_table \
+  --processor cv181x \
+  --tolerance 0.85,0.45 \
+  --model yolov8n_tennis_cv181x_int8.cvimodel
+2026/04/17 01:13:51 - INFO : TPU-MLIR v1.27-20260206
+2026/04/17 01:13:51 - INFO : 
+  load_config Preprocess args : 
+        resize_dims           : [640, 640]
+        keep_aspect_ratio     : True
+        keep_ratio_mode       : letterbox
+        pad_value             : 0
+        pad_type              : center
+        input_dims            : [640, 640]
+        --------------------------
+        mean                  : [0.0, 0.0, 0.0]
+        scale                 : [0.0039216, 0.0039216, 0.0039216]
+        --------------------------
+        pixel_format          : rgb
+        channel_format        : nchw
+        yuv_type              : 
+
+[Success] Create config file 'yolov8n_tennis_cv181x_int8.layer_group_config.json'.
+Content:
+{
+  "shape_secs_search_strategy": 0,
+  "structure_detect_opt": true,
+  "sc_method_configs": [
+    {
+      "sc_method": "sc_method_quick_search",
+      "MAX_TRY_NUM": 20
+    },
+    {
+      "sc_method": "sc_method_search_better_v1",
+      "NSECS_SEARCH_RECORD_THRESHOLD": 3,
+      "CSECS_SEARCH_RECORD_THRESHOLD": 3,
+      "DSECS_SEARCH_RECORD_THRESHOLD": 3,
+      "HSECS_SEARCH_RECORD_THRESHOLD": 3,
+      "WSECS_SEARCH_RECORD_THRESHOLD": 3
+    },
+    {
+      "sc_method": "sc_method_search_better_v2",
+      "MAX_NSECS": 32,
+      "MAX_CSECS": 32,
+      "MAX_DSECS": 32,
+      "MAX_HSECS": 32,
+      "MAX_WSECS": 32,
+      "NSECS_SEARCH_RECORD_THRESHOLD": 2,
+      "CSECS_SEARCH_RECORD_THRESHOLD": 2,
+      "DSECS_SEARCH_RECORD_THRESHOLD": 2,
+      "HSECS_SEARCH_RECORD_THRESHOLD": 2,
+      "WSECS_SEARCH_RECORD_THRESHOLD": 2
+    }
+  ]
+}
+[Running]: tpuc-opt yolov8n_tennis.mlir --processor-assign="chip=cv181x mode=INT8 num_device=1 num_core=1 addr_mode=auto high_precision=False" --import-calibration-table="file=yolov8n_cali_table asymmetric=False" --processor-top-optimize --convert-top-to-tpu="weightFileName=yolov8n_tennis_cv181x_int8_sym_tpu_weights.npz asymmetric=False doWinograd=False q_group_size=0 q_symmetric=False matmul_perchannel=False gelu_mode=normal" --canonicalize --weight-fold -o yolov8n_tennis_cv181x_int8_sym_tpu.mlir
+[Success]: tpuc-opt yolov8n_tennis.mlir --processor-assign="chip=cv181x mode=INT8 num_device=1 num_core=1 addr_mode=auto high_precision=False" --import-calibration-table="file=yolov8n_cali_table asymmetric=False" --processor-top-optimize --convert-top-to-tpu="weightFileName=yolov8n_tennis_cv181x_int8_sym_tpu_weights.npz asymmetric=False doWinograd=False q_group_size=0 q_symmetric=False matmul_perchannel=False gelu_mode=normal" --canonicalize --weight-fold -o yolov8n_tennis_cv181x_int8_sym_tpu.mlir
+[Running]: tpuc-opt yolov8n_tennis_cv181x_int8_sym_tpu.mlir --mlir-disable-threading --strip-io-quant="quant_input=False quant_output=False quant_input_list= quant_output_list= quant_output_bf16=False quant_input_int8=False quant_output_int8=False " --processor-tpu-optimize --dev-parallel --weight-reorder  --subnet-divide="dynamic=False" --op-reorder --topo-sort --layer-group="opt=2 group_by_cores=auto compress_mode=none debugger=0 disable_group_overlap=false lgcache=true config_filename= enable_lghash=False lghash_dir="  --core-parallel  --after-layergroup-weight-reorder --address-assign -o yolov8n_tennis_cv181x_int8_sym_final.mlir --debug_cmd=
+Dumping LgConfig!
+Global Configs:
+  shape_secs_search_strategy = 0
+  structure_detect_opt = 1
+Search Method Config: sc_method_quick_search
+  CSECS_SEARCH_RECORD_THRESHOLD = -1
+  DSECS_SEARCH_RECORD_THRESHOLD = -1
+  HSECS_SEARCH_RECORD_THRESHOLD = -1
+  MAX_CSECS = 32
+  MAX_DSECS = 32
+  MAX_HSECS = 32
+  MAX_NSECS = 32
+  MAX_TRY_NUM = 20
+  MAX_WSECS = 32
+  NSECS_SEARCH_RECORD_THRESHOLD = -1
+  WSECS_SEARCH_RECORD_THRESHOLD = -1
+Search Method Config: sc_method_search_better_v1
+  CSECS_SEARCH_RECORD_THRESHOLD = 3
+  DSECS_SEARCH_RECORD_THRESHOLD = 3
+  HSECS_SEARCH_RECORD_THRESHOLD = 3
+  MAX_CSECS = 32
+  MAX_DSECS = 32
+  MAX_HSECS = 32
+  MAX_NSECS = 32
+  MAX_TRY_NUM = 20
+  MAX_WSECS = 32
+  NSECS_SEARCH_RECORD_THRESHOLD = 3
+  WSECS_SEARCH_RECORD_THRESHOLD = 3
+Search Method Config: sc_method_search_better_v2
+  CSECS_SEARCH_RECORD_THRESHOLD = 2
+  DSECS_SEARCH_RECORD_THRESHOLD = 2
+  HSECS_SEARCH_RECORD_THRESHOLD = 2
+  MAX_CSECS = 32
+  MAX_DSECS = 32
+  MAX_HSECS = 32
+  MAX_NSECS = 32
+  MAX_TRY_NUM = 20
+  MAX_WSECS = 32
+  NSECS_SEARCH_RECORD_THRESHOLD = 2
+  WSECS_SEARCH_RECORD_THRESHOLD = 2
+Load debugger file "yolov8n_tennis_cv181x_int8.layer_group_config.json" success!
+output_bytes: 1228800, before group, NetStatisticPass total_bytes: 6144000
+==---------------------------==
+Run LayerGroupSearchPass : 
+    Searching the optimal layer groups
+==---------------------------==
+Failed to open hash file from all available paths:
+  - current directory: 4721343393230787581
+
+=======================================================
+***** Dynamic Programming layer group with cluster ****
+=======================================================
+total num of base_group is 2
+process base group 0, layer_num=1, cluster_num=1
+process base group 1, layer_num=1, cluster_num=1
+================FINAL GROUP================
+GroupMethod_process time:2855
+==---------------------------==
+Run GroupPostTransformPass : 
+    Some transform after layer groups is determined
+==---------------------------==
+==---------------------------==
+Run TimeStepAssignmentPass : 
+    Assign timestep task for each group.
+==---------------------------==
+==---------------------------==
+Run LocalMemoryAllocationPass : 
+    Allocate local memory for all layer groups
+==---------------------------==
+==---------------------------==
+Run TimeStepCombinePass : 
+    Combine time step for better parallel balance
+==---------------------------==
+==---------------------------==
+Run GroupDataMoveOverlapPass : 
+    Overlap data move between two layer group
+==---------------------------==
+output_bytes: 168000, before group, NetStatisticPass total_bytes: 55552704
+==---------------------------==
+Run LayerGroupSearchPass : 
+    Searching the optimal layer groups
+==---------------------------==
+Failed to open hash file from all available paths:
+  - current directory: 4721343393230787581
+
+=======================================================
+***** Dynamic Programming layer group with cluster ****
+=======================================================
+total num of base_group is 47
+process base group 0, layer_num=6, cluster_num=6
+Searching best group slices...
+Getting single group cost...
+[                       #                       #] 100%
+Getting cost table...
+[                       #                       #] 100%
+process base group 1, layer_num=1, cluster_num=1
+process base group 2, layer_num=1, cluster_num=1
+process base group 3, layer_num=12, cluster_num=12
+Searching best group slices...
+Getting single group cost...
+[   #    #    #    #    #    #    #    #    #   #] 100%
+Getting cost table...
+[   #    #    #    #    #    #    #    #    #   #] 100%
+process base group 4, layer_num=1, cluster_num=1
+process base group 5, layer_num=1, cluster_num=1
+process base group 6, layer_num=17, cluster_num=17
+Searching best group slices...
+Getting single group cost...
+[  #     #  #      #  #      #  #      #  #     #] 100%
+Getting cost table...
+[  #     #  #      #  #      #  #      #  #     #] 100%
+process base group 7, layer_num=1, cluster_num=1
+process base group 8, layer_num=1, cluster_num=1
+process base group 9, layer_num=17, cluster_num=17
+Searching best group slices...
+Getting single group cost...
+[  #     #  #      #  #      #  #      #  #     #] 100%
+Getting cost table...
+[  #     #  #      #  #      #  #      #  #     #] 100%
+process base group 10, layer_num=1, cluster_num=1
+process base group 11, layer_num=1, cluster_num=1
+process base group 12, layer_num=19, cluster_num=19
+Searching best group slices...
+Getting single group cost...
+[                        #  #  #  #  #  #  #  # #] 100%
+Getting cost table...
+[                        #  #  #  #  #  #  #  # #] 100%
+process base group 13, layer_num=1, cluster_num=1
+process base group 14, layer_num=1, cluster_num=1
+process base group 15, layer_num=11, cluster_num=11
+Searching best group slices...
+Getting single group cost...
+[         #          #          #          #    #] 100%
+Getting cost table...
+[         #          #          #          #    #] 100%
+process base group 16, layer_num=1, cluster_num=1
+process base group 17, layer_num=1, cluster_num=1
+process base group 18, layer_num=22, cluster_num=22
+Searching best group slices...
+Getting single group cost...
+[   #    #    #    #    #    #    #    #    #   #] 100%
+Getting cost table...
+[   #    #    #    #    #    #    #    #    #   #] 100%
+process base group 19, layer_num=1, cluster_num=1
+process base group 20, layer_num=1, cluster_num=1
+process base group 21, layer_num=1, cluster_num=1
+process base group 22, layer_num=1, cluster_num=1
+process base group 23, layer_num=22, cluster_num=22
+Searching best group slices...
+Getting single group cost...
+[   #    #    #    #    #    #    #    #    #   #] 100%
+Getting cost table...
+[   #    #    #    #    #    #    #    #    #   #] 100%
+process base group 24, layer_num=1, cluster_num=1
+process base group 25, layer_num=1, cluster_num=1
+process base group 26, layer_num=1, cluster_num=1
+process base group 27, layer_num=1, cluster_num=1
+process base group 28, layer_num=17, cluster_num=17
+Searching best group slices...
+Getting single group cost...
+[  #     #  #      #  #      #  #      #  #     #] 100%
+Getting cost table...
+[  #     #  #      #  #      #  #      #  #     #] 100%
+process base group 29, layer_num=1, cluster_num=1
+process base group 30, layer_num=1, cluster_num=1
+process base group 31, layer_num=1, cluster_num=1
+process base group 32, layer_num=1, cluster_num=1
+process base group 33, layer_num=1, cluster_num=1
+process base group 34, layer_num=1, cluster_num=1
+process base group 35, layer_num=1, cluster_num=1
+process base group 36, layer_num=1, cluster_num=1
+process base group 37, layer_num=1, cluster_num=1
+process base group 38, layer_num=1, cluster_num=1
+process base group 39, layer_num=1, cluster_num=1
+process base group 40, layer_num=1, cluster_num=1
+process base group 41, layer_num=1, cluster_num=1
+process base group 42, layer_num=12, cluster_num=12
+Searching best group slices...
+Getting single group cost...
+[   #    #    #    #    #    #    #    #    #   #] 100%
+Getting cost table...
+[   #    #    #    #    #    #    #    #    #   #] 100%
+process base group 43, layer_num=1, cluster_num=1
+process base group 44, layer_num=2, cluster_num=2
+Searching best group slices...
+Getting single group cost...
+[                                                  ] 0%
+Getting cost table...
+[                                                  ] 0%
+process base group 45, layer_num=1, cluster_num=1
+process base group 46, layer_num=1, cluster_num=1
+================FINAL GROUP================
+GroupMethod_process time:168092
+==---------------------------==
+Run GroupPostTransformPass : 
+    Some transform after layer groups is determined
+==---------------------------==
+==---------------------------==
+Run TimeStepAssignmentPass : 
+    Assign timestep task for each group.
+==---------------------------==
+==---------------------------==
+Run LocalMemoryAllocationPass : 
+    Allocate local memory for all layer groups
+==---------------------------==
+==---------------------------==
+Run TimeStepCombinePass : 
+    Combine time step for better parallel balance
+==---------------------------==
+===group idx: 6
+merge timestep 5 to timestep 4
+===group idx: 15
+merge timestep 3 to timestep 2
+===group idx: 29
+merge timestep 2 to timestep 1
+===group idx: 40
+merge timestep 2 to timestep 1
+===group idx: 47
+merge timestep 2 to timestep 1
+===group idx: 67
+merge timestep 2 to timestep 1
+===group idx: 70
+merge timestep 3 to timestep 2
+==---------------------------==
+Run GroupDataMoveOverlapPass : 
+    Overlap data move between two layer group
+==---------------------------==
+GmemAllocator use OpSizeOrderAssign
+GmemAllocator use FitFirstAssign
+[Success]: tpuc-opt yolov8n_tennis_cv181x_int8_sym_tpu.mlir --mlir-disable-threading --strip-io-quant="quant_input=False quant_output=False quant_input_list= quant_output_list= quant_output_bf16=False quant_input_int8=False quant_output_int8=False " --processor-tpu-optimize --dev-parallel --weight-reorder  --subnet-divide="dynamic=False" --op-reorder --topo-sort --layer-group="opt=2 group_by_cores=auto compress_mode=none debugger=0 disable_group_overlap=false lgcache=true config_filename= enable_lghash=False lghash_dir="  --core-parallel  --after-layergroup-weight-reorder --address-assign -o yolov8n_tennis_cv181x_int8_sym_final.mlir --debug_cmd=
+[Running]: tpuc-opt yolov8n_tennis_cv181x_int8_sym_final.mlir --codegen="model_file=yolov8n_tennis_cv181x_int8.cvimodel embed_debug_info=False model_version=latest bmodel_only=False gdma_check=True" -o /dev/null
+  [oc_pos=0] cur_oc 1, stepSize 16, compressedSize 48, SKIP
+[Success]: tpuc-opt yolov8n_tennis_cv181x_int8_sym_final.mlir --codegen="model_file=yolov8n_tennis_cv181x_int8.cvimodel embed_debug_info=False model_version=latest bmodel_only=False gdma_check=True" -o /dev/null
+root@0a828d0b1427:/workspace/tpu_convert# 

@@ -8,7 +8,7 @@ from .adapter import ModelAdapter
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Train a tennis detector with YOLO26.")
-    parser.add_argument("--model", default="yolo26n.pt", help="Pretrained model or config path.")
+    parser.add_argument("--model", default="yolov8n.pt", help="Pretrained model or config path.")
     parser.add_argument(
         "--data",
         default="configs/tennis_ball.yaml",

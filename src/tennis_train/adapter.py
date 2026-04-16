@@ -186,7 +186,8 @@ class ModelAdapter:
             str(onnx_path),
             str(output_path),
             calibration_data_reader=data_reader,
+            activation_type=QuantType.QUInt8,
             weight_type=QuantType.QUInt8,
-            calibration_method=cal_method,
+            calibrate_method=cal_method,
         )
         print(f"静态量化完成: {output_path}")

@@ -1,4 +1,4 @@
-path: dataset/Tennis Ball Obj Det.v1i.yolo26
+path: dataset
 train: train/images
 val: valid/images
 test: test/images
